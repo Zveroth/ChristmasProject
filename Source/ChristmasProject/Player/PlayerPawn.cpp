@@ -4,6 +4,7 @@
 #include "PlayerPawn.h"
 #include "ConstructorHelpers.h"
 #include "Components/StaticMeshComponent.h"
+#include "Level/TransparentWall.h"
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -19,19 +20,33 @@ APlayerPawn::APlayerPawn()
 	m_PlayerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	m_PlayerMesh->SetupAttachment(RootComponent);
 	m_PlayerMesh->RelativeScale3D = FVector(0.25f, 0.25f, 1.0f);
-	m_PlayerMesh->SetStaticMesh(ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Engine/BasicShapes/Cube")).Object);
+	m_PlayerMesh->SetStaticMesh(ConstructorHelpers::FObjectFinder<UStaticMesh>(TEXT("/Game/Wall_Mesh")).Object);
 	
 	m_CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
 	m_CameraArm->SetupAttachment(RootComponent);
 	m_CameraArm->RelativeRotation = FRotator(-45.0f, 0.0f, 0.0f);
 	m_CameraArm->TargetArmLength = 1500.0f;
 	m_CameraArm->bDoCollisionTest = false;
-	m_CameraArm->CameraLagSpeed = 1.5f;
+	m_CameraArm->bEnableCameraLag = true;
+	m_CameraArm->CameraLagSpeed = 4.0f;
 
 	m_PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	m_PlayerCamera->SetupAttachment(m_CameraArm, USpringArmComponent::SocketName);
 	m_PlayerCamera->SetProjectionMode(ECameraProjectionMode::Perspective);
 	m_PlayerCamera->SetFieldOfView(60.0f);
+
+	m_WallDetection = CreateDefaultSubobject<UCapsuleComponent>(TEXT("WallDetection"));
+	m_WallDetection->SetupAttachment(RootComponent);
+	m_WallDetection->InitCapsuleSize(200.0f, 200.0f);
+	m_WallDetection->SetCollisionProfileName("WDet");
+
+	FScriptDelegate DummyB;
+	DummyB.BindUFunction(this, FName("WallBeginOverlap"));
+	m_WallDetection->OnComponentBeginOverlap.AddUnique(DummyB);
+
+	FScriptDelegate DummyE;
+	DummyE.BindUFunction(this, FName("WallEndOverlap"));
+	m_WallDetection->OnComponentEndOverlap.AddUnique(DummyE);
 }
 
 // Called when the game starts or when spawned
@@ -46,10 +61,11 @@ void APlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (MovementDir != FVector::ZeroVector)
+	if (m_MovementDir != FVector::ZeroVector)
 	{
-		m_PlayerMesh->SetWorldRotation(MovementDir.Rotation());
-		AddActorWorldOffset(MovementDir * 300.0f * DeltaTime, true);
+		m_PlayerMesh->SetWorldRotation(m_MovementDir.Rotation());
+		m_MovementDir.Normalize();
+		AddActorWorldOffset(m_MovementDir * 300.0f * DeltaTime, true);
 	}
 }
 
@@ -64,10 +80,23 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void APlayerPawn::SetXMovement(float MS)
 {
-	MovementDir.X = MS;
+	m_MovementDir.X = MS;
 }
 
 void APlayerPawn::SetYMovement(float MS)
 {
-	MovementDir.Y = MS;
+	m_MovementDir.Y = MS;
+}
+
+
+void APlayerPawn::WallBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (ATransparentWall* Wall = Cast<ATransparentWall>(OtherActor))
+		Wall->FadeOut();
+}
+
+void APlayerPawn::WallEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (ATransparentWall* Wall = Cast<ATransparentWall>(OtherActor))
+		Wall->FadeIn();
 }

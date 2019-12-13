@@ -44,8 +44,16 @@ private:
 	UPROPERTY(VisibleAnywhere)
 		UCapsuleComponent* m_PlayerCapsule;
 
-	FVector MovementDir;
+	UPROPERTY(VisibleAnywhere)
+		UCapsuleComponent* m_WallDetection;
+
+	FVector m_MovementDir;
 
 	void SetXMovement(float MS);
 	void SetYMovement(float MS);
+
+	UFUNCTION()
+		void WallBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void WallEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };
