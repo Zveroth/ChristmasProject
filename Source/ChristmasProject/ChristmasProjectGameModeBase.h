@@ -13,5 +13,7 @@ UCLASS()
 class CHRISTMASPROJECT_API AChristmasProjectGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+
+	AChristmasProjectGameModeBase(const class FObjectInitializer& ObjectInitializer);
 };

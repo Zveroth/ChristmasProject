@@ -2,4 +2,12 @@
 
 
 #include "ChristmasProjectGameModeBase.h"
+#include "Player/PlayerPawn.h"
 
+
+
+AChristmasProjectGameModeBase::AChristmasProjectGameModeBase(const class FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer)
+{
+	DefaultPawnClass = APlayerPawn::StaticClass();
+}
