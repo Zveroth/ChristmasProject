@@ -33,21 +33,24 @@ public:
 private:
 
 	UPROPERTY(VisibleAnywhere)
-		UStaticMeshComponent* m_PlayerMesh;
+		UStaticMeshComponent* PlayerMesh;
 
 	UPROPERTY(VisibleAnywhere)
-		UCameraComponent* m_PlayerCamera;
+		UCameraComponent* PlayerCamera;
 
 	UPROPERTY(VisibleAnywhere)
-		USpringArmComponent* m_CameraArm;
+		USpringArmComponent* CameraArm;
 
 	UPROPERTY(VisibleAnywhere)
-		UCapsuleComponent* m_PlayerCapsule;
+		UCapsuleComponent* PlayerCapsule;
 
 	UPROPERTY(VisibleAnywhere)
-		UCapsuleComponent* m_WallDetection;
+		UCapsuleComponent* WallDetection;
 
-	FVector m_MovementDir;
+	UPROPERTY(VisibleAnywhere)
+		UCapsuleComponent* SantaDetection;
+
+	FVector MovementDir;
 
 	void SetXMovement(float MS);
 	void SetYMovement(float MS);
@@ -56,4 +59,11 @@ private:
 		void WallBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 		void WallEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+		void SantaBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void SantaEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	bool bCloseToSanta;
 };

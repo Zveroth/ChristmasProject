@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TransparentWall.generated.h"
+#include "Santa.generated.h"
 
 UCLASS()
-class CHRISTMASPROJECT_API ATransparentWall : public AActor
+class CHRISTMASPROJECT_API ASanta : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ATransparentWall();
+	ASanta();
 
 protected:
 	// Called when the game starts or when spawned
@@ -23,20 +23,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void FadeIn();
-	void FadeOut();
 
 private:
 
 	UPROPERTY(VisibleAnywhere)
-		UStaticMeshComponent* WallMesh;
-
-	UPROPERTY()
-		UMaterialInstanceDynamic* WallMat;
-
-	UPROPERTY(VisibleAnywhere)
-		float MinimumOpacity;
-
-	float CurrentOpacity;
-	float OpacityChange;
+		UStaticMeshComponent* SantaMesh;
 };
